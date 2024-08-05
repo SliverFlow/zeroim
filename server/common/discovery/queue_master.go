@@ -8,7 +8,7 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
-// QueueMaster
+// QueueMaster 队列master
 type QueueMaster struct {
 	members  map[string]kq.KqConf // 队列配置
 	cli      *clientv3.Client     // etcd cli
@@ -32,22 +32,22 @@ func NewQueueMaster(rootPath string, hosts []string) (*QueueMaster, error) {
 	}, err
 }
 
-// Register
+// Register 注册
 func (m *QueueMaster) Register(o QueueObserver) {
 	m.observer = o
 }
 
-// notifyUpdate
+// notifyUpdate 通知更新
 func (m *QueueMaster) notifyUpdate(key string, kqConf kq.KqConf) {
 	m.observer.Update(key, kqConf)
 }
 
-// notifyDelete
+// notifyDelete 通知删除
 func (m *QueueMaster) notifyDelete(key string) {
 	m.observer.Delete(key)
 }
 
-// addQueueWorker
+// addQueueWorker 添加队列配置
 func (m *QueueMaster) addQueueWorker(key string, kqConf kq.KqConf) {
 	if len(kqConf.Brokers) == 0 || len(kqConf.Topic) == 0 {
 		logx.Errorf("invalid kqConf: %+v", kqConf)
@@ -69,13 +69,13 @@ func (m *QueueMaster) updateQueueWorker(key string, kqConf kq.KqConf) {
 	m.notifyUpdate(key, kqConf)
 }
 
-// deleteQueueWorker
+// deleteQueueWorker 删除队列配置
 func (m *QueueMaster) deleteQueueWorker(key string) {
 	delete(m.members, key)
 	m.notifyDelete(key)
 }
 
-// WatchQueueWorkers
+// WatchQueueWorkers 监听队列配置
 func (m *QueueMaster) WatchQueueWorkers() {
 	rch := m.cli.Watch(context.Background(), m.rootPath, clientv3.WithPrefix())
 

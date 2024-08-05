@@ -5,7 +5,7 @@ import (
 	"github.com/zeromicro/go-zero/core/discov"
 )
 
-// QueueObserver
+// QueueObserver 队列观察者
 type QueueObserver interface {
 	Update(string, kq.KqConf)
 	Delete(string)
